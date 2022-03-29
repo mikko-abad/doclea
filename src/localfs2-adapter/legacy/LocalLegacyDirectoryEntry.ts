@@ -6,9 +6,9 @@ import type {
 } from '@lib/StorageFrameworkEntry'
 import { Result } from '@lib/utilities'
 import type { OkOrError } from '@lib/utilities'
-import { LocalFileEntry } from './LocalFileEntry'
+import { LocalLegacyFileEntry } from './LocalLegacyFileEntry'
 
-export default class LocalDirectoryEntry
+export default class LocalLegacyDirectoryEntry
   implements StorageFrameworkDirectoryEntry
 {
   readonly isDirectory: true
@@ -16,7 +16,7 @@ export default class LocalDirectoryEntry
   readonly fullPath: string
   readonly name: string
   private directory: FileSystemDirectoryEntry
-  private parent: LocalDirectoryEntry
+  private parent: LocalLegacyDirectoryEntry
 
   constructor(directory: FileSystemDirectoryEntry) {
     this.directory = directory
@@ -25,7 +25,9 @@ export default class LocalDirectoryEntry
     this.isDirectory = true
     this.isFile = false
     this.directory.getParent((parent) => {
-      this.parent = new LocalDirectoryEntry(<FileSystemDirectoryEntry>parent)
+      this.parent = new LocalLegacyDirectoryEntry(
+        <FileSystemDirectoryEntry>parent
+      )
     })
   }
 
@@ -41,8 +43,10 @@ export default class LocalDirectoryEntry
           resolve(
             results.map((entry) => {
               if (entry.isDirectory)
-                return new LocalDirectoryEntry(<FileSystemDirectoryEntry>entry)
-              else return new LocalFileEntry(<FileSystemFileEntry>entry)
+                return new LocalLegacyDirectoryEntry(
+                  <FileSystemDirectoryEntry>entry
+                )
+              else return new LocalLegacyFileEntry(<FileSystemFileEntry>entry)
             })
           )
         },
@@ -63,7 +67,7 @@ export default class LocalDirectoryEntry
         name,
         { create: true },
         (file) => {
-          let fileEntry = new LocalFileEntry(<FileSystemFileEntry>file)
+          let fileEntry = new LocalLegacyFileEntry(<FileSystemFileEntry>file)
           resolve(fileEntry)
         },
         (err) =>
@@ -85,7 +89,9 @@ export default class LocalDirectoryEntry
         name,
         { create: true },
         (folder) =>
-          resolve(new LocalDirectoryEntry(<FileSystemDirectoryEntry>folder)),
+          resolve(
+            new LocalLegacyDirectoryEntry(<FileSystemDirectoryEntry>folder)
+          ),
         (err) =>
           reject(
             new SFError(
@@ -104,10 +110,10 @@ export default class LocalDirectoryEntry
   moveTo(directory: StorageFrameworkDirectoryEntry): OkOrError<SFError> {
     return new Result((resolve, reject) => {
       this.directory.moveTo(
-        (<LocalDirectoryEntry>directory).getDirectoryEntry(),
+        (<LocalLegacyDirectoryEntry>directory).getDirectoryEntry(),
         this.name,
         () => {
-          this.parent = <LocalDirectoryEntry>directory
+          this.parent = <LocalLegacyDirectoryEntry>directory
           resolve()
         },
         (err) =>

@@ -9,7 +9,10 @@
   var base: StorageFrameworkEntry
 
   if (window.requestFileSystem || window.webkitRequestFileSystem) {
-    new LocalFileSystem().open().then((entry) => (base = entry))
+    new LocalFileSystem().open().then((entry) => {
+      base = entry
+      console.log('base')
+    })
   }
 
   function dropHandler(event) {

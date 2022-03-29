@@ -11,7 +11,7 @@ window.directoryEntry = window.directoryEntry || window.webkitDirectoryEntry
 export class LocalFileSystem implements StorageFrameworkFileSystem {
   open(): Result<StorageFrameworkEntry, SFError> {
     return new Result((resolve, reject) => {
-      window.requestFileSystem(Window.PERSISTENT, 15 * 1024 ** 2, (fs) => {
+      window.requestFileSystem(Window.PERSISTENT, 1 * 1024 ** 2, (fs) => {
         fs.root.getDirectory(
           'base',
           { create: true },

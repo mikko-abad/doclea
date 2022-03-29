@@ -8,11 +8,11 @@
   import BrandGithub from 'tabler-icons-svelte/icons/BrandGithub.svelte'
   import Cloud from 'tabler-icons-svelte/icons/Cloud.svelte'
 
-
   import { onMount } from 'svelte'
   import { renderTLDrawToElement } from './tldraw/editor'
   import { ColorStyle, TDShapeType } from '@tldraw/tldraw'
   import { prefersDarkMode } from './prefersDarkMode'
+  import { LocalFileSystem2 } from '@src/localfs2-adapter/LocalFilesystem'
 
   let tldraw
   onMount(() => {
@@ -20,7 +20,7 @@
       if (prefersDarkMode) api.toggleDarkMode()
     })
   })
-  
+
   function showDropper() {
     document
       .querySelector('#fileDropper')
@@ -32,7 +32,12 @@
   <div id="sidepane">
     <Button on:click={showDropper}><Folder /> Open Local File</Button>
     <div id="fileDropper" style="display:none"><LocalFs /></div>
-    <Button><BrandGithub /> Open Github Project</Button>
+    <input type="file" webkitdirectory="true" />
+    <Button
+      on:click={() => {
+        new LocalFileSystem2().open()
+      }}><BrandGithub /> Open Github Project</Button
+    >
     <Button><Cloud /> Open Solid Folder</Button>
   </div>
   <div>
