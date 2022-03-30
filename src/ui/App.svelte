@@ -7,15 +7,15 @@
   import BrandGithub from 'tabler-icons-svelte/icons/BrandGithub.svelte'
   import Cloud from 'tabler-icons-svelte/icons/Cloud.svelte'
   import { onMount } from 'svelte'
-  import { renderTLDrawToElement } from './tldraw/editor'
+  //import { renderTLDrawToElement } from './tldraw/editor'
   import { ColorStyle, TDShapeType } from '@tldraw/tldraw'
   import { prefersDarkMode } from './prefersDarkMode'
 
   let tldraw
   onMount(() => {
-    renderTLDrawToElement(tldraw).then((api) => {
-      if (prefersDarkMode) api.toggleDarkMode()
-    })
+    // renderTLDrawToElement(tldraw).then((api) => {
+    //   if (prefersDarkMode) api.toggleDarkMode()
+    // })
   })
 </script>
 

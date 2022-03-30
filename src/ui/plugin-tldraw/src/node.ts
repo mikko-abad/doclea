@@ -20,7 +20,7 @@ export type Options = {
 
 export const TurnIntoDiagram = createCmdKey('TurnIntoDiagram')
 
-export const diagramNode = createNode<string, Options>((utils, options) => {
+export const tldrawNode = createNode<string, Options>((utils, options) => {
   const { mermaidVariables, codeStyle, hideCodeStyle, previewPanelStyle } =
     getStyle(utils)
   const header = `%%{init: {'theme': 'base', 'themeVariables': { ${mermaidVariables()} }}}%%\n`
@@ -39,11 +39,13 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
     id,
     schema: () => ({
       content: 'text*',
-      group: 'block',
+      group: 'inline',
+      inline: true,
       marks: '',
       defining: true,
       atom: true,
-      code: true,
+
+      //  code: true,
       isolating: true,
       attrs: {
         value: {
@@ -55,14 +57,14 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
       },
       parseDOM: [
         {
-          tag: `div[data-type="${id}"]`,
+          tag: `img[data-type="${id}"]`,
           preserveWhitespace: 'full',
           getAttrs: (dom) => {
             if (!(dom instanceof HTMLElement)) {
               throw new Error()
             }
             return {
-              value: dom.dataset['value'],
+              value: dom.dataset['url'],
               identity: dom.id,
             }
           },
@@ -71,12 +73,12 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
       toDOM: (node) => {
         const identity = getId(node)
         return [
-          'div',
+          'img',
           {
             id: identity,
             class: utils.getClassName(node.attrs, 'tldraw'),
             'data-type': id,
-            'data-value': node.attrs['value'],
+            url: node.attrs['value'],
           },
           0,
         ]
@@ -145,8 +147,7 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
 
       // render(node.attrs['value'])
 
-      rendered.innerHTML =
-        '<img src="https://images.unsplash.com/photo-1647496849104-4a1cf582aae9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60">'
+      rendered.innerHTML = `<img src="${node.attrs['value']}">`
 
       dom.appendChild(rendered)
 
@@ -156,32 +157,33 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
           if (!updatedNode.sameMarkup(currentNode)) return false
           currentNode = updatedNode
 
-          const innerView = innerEditor.innerView()
-          if (innerView) {
-            const state = innerView.state
-            const start = updatedNode.content.findDiffStart(state.doc.content)
-            if (start !== null && start !== undefined) {
-              const diff = updatedNode.content.findDiffEnd(state.doc.content)
-              if (diff) {
-                let { a: endA, b: endB } = diff
-                const overlap = start - Math.min(endA, endB)
-                if (overlap > 0) {
-                  endA += overlap
-                  endB += overlap
-                }
-                innerView.dispatch(
-                  state.tr
-                    .replace(start, endB, node.slice(start, endA))
-                    .setMeta('fromOutside', true)
-                )
-              }
-            }
-          }
+          //   const innerView = innerEditor.innerView()
+          //   if (innerView) {
+          //     const state = innerView.state
+          //     const start = updatedNode.content.findDiffStart(state.doc.content)
+          //     if (start !== null && start !== undefined) {
+          //       const diff = updatedNode.content.findDiffEnd(state.doc.content)
+          //       if (diff) {
+          //         let { a: endA, b: endB } = diff
+          //         const overlap = start - Math.min(endA, endB)
+          //         if (overlap > 0) {
+          //           endA += overlap
+          //           endB += overlap
+          //         }
+          //         innerView.dispatch(
+          //           state.tr
+          //             .replace(start, endB, node.slice(start, endA))
+          //             .setMeta('fromOutside', true)
+          //         )
+          //       }
+          //     }
+          //   }
 
           const newVal = updatedNode.content.firstChild?.text || ''
+          console.log({ newVal })
           code.dataset['value'] = newVal
 
-          render(newVal)
+          //render(newVal)
 
           return true
         },
@@ -214,9 +216,12 @@ export const diagramNode = createNode<string, Options>((utils, options) => {
         },
       }
     },
-    inputRules: (nodeType) => [
-      textblockTypeInputRule(inputRegex, nodeType, () => ({ id: getId() })),
-    ],
+    inputRules: (nodeType) => {
+      console.log(nodeType)
+      return [
+        textblockTypeInputRule(inputRegex, nodeType, () => ({ id: getId() })),
+      ]
+    },
     remarkPlugins: () => [remarkMermaid],
   }
 })

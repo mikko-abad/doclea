@@ -2,12 +2,11 @@
   import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core'
   import { clipboard } from '@milkdown/plugin-clipboard'
   import { cursor } from '@milkdown/plugin-cursor'
-  import { diagram } from '@milkdown/plugin-diagram'
+  import { diagram } from '@milkdown/plugin-diagram/src'
   import { emoji } from '@milkdown/plugin-emoji'
   import { history } from '@milkdown/plugin-history'
   import { indent } from '@milkdown/plugin-indent'
   import { listener, listenerCtx } from '@milkdown/plugin-listener'
-  import { math } from '@milkdown/plugin-math'
   import { menu } from '@milkdown/plugin-menu'
   import { prism } from '@milkdown/plugin-prism'
   import { slash } from '@milkdown/plugin-slash'
@@ -16,6 +15,8 @@
   import { gfm } from '@milkdown/preset-gfm'
   import { nord } from '@milkdown/theme-nord'
   import PrismTheme from './PrismTheme.svelte'
+  import { math } from '@milkdown/plugin-math'
+  import { tldraw } from './plugin-tldraw/src'
 
   export let defaultValue = '# Hello'
 
@@ -33,9 +34,11 @@
       .use(history)
       .use(cursor)
       .use(prism)
+      .use(tldraw)
       .use(diagram)
       .use(tooltip)
       .use(math)
+      //.use(iframePlugin)
       .use(emoji)
       .use(indent)
       .use(upload)

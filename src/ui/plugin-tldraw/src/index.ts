@@ -2,11 +2,11 @@
 
 import { AtomList } from '@milkdown/utils'
 
-import { diagramNode } from './node'
+import { tldrawNode } from './node'
 
 export * from './remark-mermaid'
 
-export const tldraw = AtomList.create([diagramNode()])
+export const tldraw = AtomList.create([tldrawNode()])
 
 export type { Options } from './node'
 export { TurnIntoDiagram } from './node'

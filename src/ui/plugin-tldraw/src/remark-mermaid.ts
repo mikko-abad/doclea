@@ -9,15 +9,14 @@ const createMermaidDiv = (contents: string) => ({
 })
 
 const visitCodeBlock = (ast: Node) =>
-  visit(ast, 'code', (node, index, parent) => {
-    const { lang, value } = node
+  visit(ast, 'image', (node, index, parent) => {
+    const { url } = node
 
-    // If this codeblock is not mermaid, bail.
-    if (lang !== 'tldraw') {
+    if (!url.startsWith('data:image/svg+xml;base64,')) {
       return node
     }
 
-    const newNode = createMermaidDiv(value)
+    const newNode = createMermaidDiv(url)
 
     if (parent && index != null) {
       parent.children.splice(index, 1, newNode)
