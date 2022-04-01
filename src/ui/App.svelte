@@ -7,22 +7,28 @@
   import BrandGithub from 'tabler-icons-svelte/icons/BrandGithub.svelte'
   import Cloud from 'tabler-icons-svelte/icons/Cloud.svelte'
   import { onMount } from 'svelte'
-  import { renderTLDrawToElement } from './tldraw/editor'
-  import { ColorStyle, TDShapeType } from '@tldraw/tldraw'
-  import { prefersDarkMode } from './prefersDarkMode'
+  // import { renderTLDrawToElement } from './tldraw/editor'
+  // import { ColorStyle, TDShapeType } from '@tldraw/tldraw'
+  // import { prefersDarkMode } from './prefersDarkMode'
+  import type { StorageFrameworkProvider } from '@lib/StorageFrameworkEntry'
+  import { GithubFileSystem } from '@github-adapter/GithubFileSystem'
 
   let tldraw
   onMount(() => {
-    renderTLDrawToElement(tldraw).then((api) => {
-      if (prefersDarkMode) api.toggleDarkMode()
-    })
+    // renderTLDrawToElement(tldraw).then((api) => {
+    //   if (prefersDarkMode) api.toggleDarkMode()
+    // })
   })
+
+  const githubStorageProvider: StorageFrameworkProvider = new GithubFileSystem()
 </script>
 
 <main>
   <div id="sidepane">
     <Button><Folder /> Open Local File</Button>
-    <Button><BrandGithub /> Open Github Project</Button>
+    <Button on:click={() => githubStorageProvider.open()}
+      ><BrandGithub /> Open Github Project</Button
+    >
     <Button><Cloud /> Open Solid Folder</Button>
   </div>
   <div>

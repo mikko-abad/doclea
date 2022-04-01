@@ -8,7 +8,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@github-adapter/*": ["src/github-adapter/*"]
     },
     /**
      * Typecheck JS in `.svelte` and `.js` files by default.

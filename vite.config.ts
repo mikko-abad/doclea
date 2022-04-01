@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@lib': path.resolve(__dirname, './src/lib'),
+      '@github-adapter': path.resolve(__dirname, './src/github-adapter'),
     },
   },
   plugins: [svelte()],
