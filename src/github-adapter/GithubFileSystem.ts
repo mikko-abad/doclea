@@ -8,6 +8,11 @@ import { Octokit } from 'https://cdn.skypack.dev/octokit'
 import { GithubDirectoryEntry } from './GithubDirectoryEntry'
 
 export class GithubFileSystem implements StorageFrameworkProvider {
+  static readonly config = {
+    owner: 'rattle99',
+    repo: 'QtNotepad',
+  }
+
   open(): Result<StorageFrameworkEntry, SFError> {
     return new Result((resolve) => {
       this.readDirFromGithub().then((githubEntry) => {
@@ -21,8 +26,8 @@ export class GithubFileSystem implements StorageFrameworkProvider {
     const { data } = await octokit.request(
       'GET /repos/{owner}/{repo}/contents/{path}',
       {
-        owner: 'rattle99',
-        repo: 'QtNotepad',
+        owner: GithubFileSystem.config.owner,
+        repo: GithubFileSystem.config.repo,
         path: '',
       }
     )

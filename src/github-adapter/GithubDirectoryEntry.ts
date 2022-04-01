@@ -8,6 +8,7 @@ import { Result, OkOrError } from '@/lib/utilities'
 import { ResolvedPos } from '@milkdown/prose'
 import { Octokit } from 'https://cdn.skypack.dev/octokit'
 import { GithubFileEntry } from './GithubFileEntry'
+import { GithubFileSystem } from './GithubFileSystem'
 
 export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
   readonly isDirectory: true
@@ -99,8 +100,8 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
     const { data } = await octokit.request(
       'GET /repos/{owner}/{repo}/contents/{path}',
       {
-        owner: 'rattle99',
-        repo: 'QtNotepad',
+        owner: GithubFileSystem.config.owner,
+        repo: GithubFileSystem.config.repo,
         path: pathToGet,
       }
     )
