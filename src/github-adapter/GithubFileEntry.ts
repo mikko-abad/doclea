@@ -7,8 +7,8 @@ import type {
 import type { Result, OkOrError } from '@/lib/utilities'
 
 export class GithubFileEntry implements StorageFrameworkFileEntry {
-  readonly isDirectory: false
-  readonly isFile: true
+  readonly isDirectory = false
+  readonly isFile = true
   readonly fullPath: string
   readonly name: string
   readonly content_url: string
@@ -18,8 +18,6 @@ export class GithubFileEntry implements StorageFrameworkFileEntry {
     this.parent = parent
     this.name = githubObj.name
     this.fullPath = githubObj.path
-    this.isDirectory = false
-    this.isFile = true
     this.content_url = githubObj.download_url
   }
 

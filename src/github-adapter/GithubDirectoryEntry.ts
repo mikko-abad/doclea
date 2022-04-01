@@ -5,14 +5,14 @@ import type {
   StorageFrameworkFileEntry,
 } from '@/lib/StorageFrameworkEntry'
 import { Result, OkOrError } from '@/lib/utilities'
-import { ResolvedPos } from '@milkdown/prose'
 import { Octokit } from 'https://cdn.skypack.dev/octokit'
+
 import { GithubFileEntry } from './GithubFileEntry'
 import { GithubFileSystem } from './GithubFileSystem'
 
 export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
-  readonly isDirectory: true
-  readonly isFile: false
+  readonly isDirectory = true
+  readonly isFile = false
   readonly fullPath: string
   readonly name: string
   isRoot: boolean
@@ -27,11 +27,11 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
     this.parent = parent
     this.name = githubEntry.name
     this.fullPath = githubEntry.path
-    this.isDirectory = true
-    this.isFile = false
+
     this.isRoot = isRoot
 
     githubEntry.forEach((element) => {
+      console.log(element)
       if (element.type == 'dir') {
         this.addDirectory(element)
       } else if (element.type == 'file') {
@@ -57,9 +57,7 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
   }
 
   getParent(): Result<StorageFrameworkDirectoryEntry, SFError> {
-    return new Result(() => {
-      this.parent
-    })
+    return new Result(() => this.parent)
   }
 
   moveTo(directory: StorageFrameworkDirectoryEntry): OkOrError<SFError> {
@@ -74,23 +72,18 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
     throw new Error('Method not implemented.')
   }
 
-  private addFile(githubObj): StorageFrameworkFileEntry {
+  private addFile(githubObj) {
     const githubFile = new GithubFileEntry(this, githubObj)
     this.children.push(githubFile)
-    return githubFile
   }
 
-  private addDirectory(
-    githubObj
-  ): Result<StorageFrameworkDirectoryEntry, SFError> {
-    return new Result((resolve) => {
-      this.readDirFromGithub(githubObj).then((githubEntry) =>
-        resolve(githubEntry)
-      )
-    })
+  private addDirectory(githubObj) {
+    const githubDirectory = new GithubDirectoryEntry(this, githubObj, false)
+
+    this.children.push(githubDirectory)
   }
 
-  private readDirFromGithub = async (githubObj) => {
+  private async readDirFromGithub(githubObj) {
     let pathToGet = githubObj.name
     if (this.fullPath != null) {
       pathToGet = this.fullPath + '/' + githubObj.name

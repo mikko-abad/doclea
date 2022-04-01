@@ -5,6 +5,7 @@ import type {
 } from '@lib/StorageFrameworkEntry'
 import { Result } from '@lib/utilities'
 import { Octokit } from 'https://cdn.skypack.dev/octokit'
+
 import { GithubDirectoryEntry } from './GithubDirectoryEntry'
 
 export class GithubFileSystem implements StorageFrameworkProvider {
@@ -21,7 +22,7 @@ export class GithubFileSystem implements StorageFrameworkProvider {
     })
   }
 
-  readDirFromGithub = async () => {
+  private async readDirFromGithub() {
     const octokit = new Octokit()
     const { data } = await octokit.request(
       'GET /repos/{owner}/{repo}/contents/{path}',
