@@ -30,6 +30,8 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
 
     this.isRoot = isRoot
 
+    if (parent != null) return
+
     githubEntry.forEach((element) => {
       console.log(element)
       if (element.type == 'dir') {
@@ -42,6 +44,13 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
 
   getChildren(): Result<StorageFrameworkEntry[], SFError> {
     return new Result(() => {
+      if (this.parent != null) {
+        const obj = {
+          name: this.name,
+          path: this.fullPath,
+        }
+        this.readDirFromGithub(obj)
+      }
       this.children
     })
   }
@@ -98,11 +107,6 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
         path: pathToGet,
       }
     )
-
-    // const githubEntry = {
-    //   path: pathToGet,
-    //   name: name,
-    // }
 
     const githubDirectory = new GithubDirectoryEntry(this, data, false)
     this.children.push(githubDirectory)
