@@ -74,12 +74,13 @@
     position: relative;
     width: 100%;
     height: 500px;
-    overflow: hidden;
-    margin-bottom: 32px;
-    user-select: none;
   }
 
-  :global(.rendered *) {
-    user-select: none;
+  :global(#TD-Zoom) {
+    margin-right: 20px;
+  }
+
+  :global(.c-bZNrxE-fvlrBy-bp-large) {
+    display: inherit !important;
   }
 </style>

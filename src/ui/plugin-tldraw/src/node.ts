@@ -2,12 +2,10 @@
 import { createCmd, createCmdKey } from '@milkdown/core'
 import { setBlockType, textblockTypeInputRule } from '@milkdown/prose'
 import { createNode } from '@milkdown/utils'
-import mermaid from 'mermaid'
 import { tldrawEditor } from '../../tldraw/editor'
 
-import { remarkMermaid } from '.'
+import { remarkMermaid } from './remark-mermaid'
 import { createInnerEditor } from './inner-editor'
-import { getStyle } from './style'
 import { getId } from './utility'
 
 const inputRegex = /^```mermaid$/
@@ -22,16 +20,7 @@ export type Options = {
 export const TurnIntoDiagram = createCmdKey('TurnIntoDiagram')
 
 export const tldrawNode = createNode<string, Options>((utils, options) => {
-  const { mermaidVariables, codeStyle, hideCodeStyle, previewPanelStyle } =
-    getStyle(utils)
-
   const id = 'tldraw'
-
-  const placeholder = {
-    empty: 'Empty',
-    error: 'Syntax Error',
-    ...(options?.placeholder ?? {}),
-  }
 
   return {
     id,
@@ -42,8 +31,6 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       marks: '',
       defining: true,
       atom: true,
-
-      //  code: true,
       isolating: true,
       attrs: {
         value: {
@@ -109,39 +96,9 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       let currentNode = node
       const dom = document.createElement('div')
       dom.classList.add('tldraw')
-      const code = document.createElement('div')
-      code.dataset['type'] = id
-      code.dataset['value'] = node.attrs['value']
-      if (codeStyle && hideCodeStyle) {
-        code.classList.add(codeStyle, hideCodeStyle)
-      }
 
       const rendered = document.createElement('div')
       rendered.id = currentId
-      if (previewPanelStyle) {
-        rendered.classList.add(previewPanelStyle)
-      }
-
-      dom.append(code)
-
-      const render = (code: string) => {
-        try {
-          if (!code) {
-            rendered.innerHTML = placeholder.empty
-          } else {
-            //const svg = mermaid.render(currentId, header + code)
-            //rendered.innerHTML = svg
-          }
-        } catch {
-          const error = document.getElementById('d' + currentId)
-          if (error) {
-            error.remove()
-          }
-          rendered.innerHTML = placeholder.error
-        } finally {
-          dom.appendChild(rendered)
-        }
-      }
 
       // render(node.attrs['value'])
 
@@ -154,42 +111,14 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
 
       const stopPropagation = (e) => e.stopPropagation()
 
-      rendered.addEventListener('click', stopPropagation)
-
-      //rendered.addEventListener('mousedown', stopPropagation)
-      //
-
       return {
         dom,
         update: (updatedNode) => {
           if (!updatedNode.sameMarkup(currentNode)) return false
           currentNode = updatedNode
 
-          //   const innerView = innerEditor.innerView()
-          //   if (innerView) {
-          //     const state = innerView.state
-          //     const start = updatedNode.content.findDiffStart(state.doc.content)
-          //     if (start !== null && start !== undefined) {
-          //       const diff = updatedNode.content.findDiffEnd(state.doc.content)
-          //       if (diff) {
-          //         let { a: endA, b: endB } = diff
-          //         const overlap = start - Math.min(endA, endB)
-          //         if (overlap > 0) {
-          //           endA += overlap
-          //           endB += overlap
-          //         }
-          //         innerView.dispatch(
-          //           state.tr
-          //             .replace(start, endB, node.slice(start, endA))
-          //             .setMeta('fromOutside', true)
-          //         )
-          //       }
-          //     }
-          //   }
-
           const newVal = updatedNode.content.firstChild?.text || ''
           console.log({ newVal })
-          code.dataset['value'] = newVal
 
           //render(newVal)
 
@@ -197,18 +126,13 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
         },
         selectNode: () => {
           if (!view.editable) return
-          if (hideCodeStyle) {
-            code.classList.remove(hideCodeStyle)
-          }
+
           innerEditor.openEditor(rendered, currentNode)
           tldrawEditor.create(rendered)
 
           //dom.classList.add('ProseMirror-selectednode')
         },
         deselectNode: () => {
-          if (hideCodeStyle) {
-            code.classList.add(hideCodeStyle)
-          }
           console.log('deselect')
           innerEditor.closeEditor()
           tldrawEditor.destroy()
@@ -225,7 +149,7 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
         ignoreMutation: () => true,
         destroy() {
           rendered.remove()
-          code.remove()
+
           dom.remove()
         },
       }

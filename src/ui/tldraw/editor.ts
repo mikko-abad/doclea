@@ -114,8 +114,6 @@ function Component({ resolveApi, tdDocument }) {
       onSaveProjectAs: console.log,
       showMenu: false,
       showPages: false,
-      width: 200,
-      onSaveProject: (p) => console.log({ p }),
     },
     null
   )
@@ -150,6 +148,8 @@ class TldrawView {
     this.mountPoint = mountPoint
     mountPoint.addEventListener('mouseup', (e) => e.stopPropagation())
     mountPoint.addEventListener('mousedown', (e) => e.stopPropagation())
+    mountPoint.addEventListener('keydown', (e) => e.stopPropagation())
+    mountPoint.addEventListener('keypress', (e) => e.stopPropagation())
 
     const src = mountPoint.querySelector('img').getAttribute('src')
     const d = openDocument(src)
