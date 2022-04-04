@@ -69,4 +69,17 @@
     top: 0;
     z-index: 5;
   }
+
+  :global(.rendered) {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    user-select: none;
+  }
+
+  :global(.rendered *) {
+    user-select: none;
+  }
 </style>
