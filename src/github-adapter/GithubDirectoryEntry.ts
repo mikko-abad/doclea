@@ -18,11 +18,13 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
   isRoot: boolean
   children: StorageFrameworkEntry[] = []
   parent: StorageFrameworkDirectoryEntry
+  octokit: Octokit
 
   constructor(
     parent: StorageFrameworkDirectoryEntry,
     githubEntry,
-    isRoot: boolean
+    isRoot: boolean,
+    octokit: Octokit
   ) {
     this.parent = parent
     this.name = githubEntry.name
@@ -82,12 +84,12 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
   }
 
   private addFile(githubObj) {
-    const githubFile = new GithubFileEntry(this, githubObj)
+    const githubFile = new GithubFileEntry(this, githubObj, this.octokit)
     this.children.push(githubFile)
   }
 
   private addDirectory(githubObj) {
-    const githubDirectory = new GithubDirectoryEntry(this, githubObj, false)
+    const githubDirectory = new GithubDirectoryEntry(this, githubObj, false, this.octokit)
 
     this.children.push(githubDirectory)
   }
@@ -98,8 +100,8 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
       pathToGet = this.fullPath + '/' + githubObj.name
     }
 
-    const octokit = new Octokit()
-    const { data } = await octokit.request(
+    // const octokit = new Octokit()
+    const { data } = await this.octokit.request(
       'GET /repos/{owner}/{repo}/contents/{path}',
       {
         owner: GithubFileSystem.config.owner,
@@ -108,7 +110,7 @@ export class GithubDirectoryEntry implements StorageFrameworkDirectoryEntry {
       }
     )
 
-    const githubDirectory = new GithubDirectoryEntry(this, data, false)
+    const githubDirectory = new GithubDirectoryEntry(this, data, false, this.octokit)
     this.children.push(githubDirectory)
     return githubDirectory
   }

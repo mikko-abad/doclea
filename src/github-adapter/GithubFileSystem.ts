@@ -14,6 +14,12 @@ export class GithubFileSystem implements StorageFrameworkProvider {
     repo: 'QtNotepad',
   }
 
+  octokit: Octokit
+
+  constructor() {
+    this.octokit = new Octokit()
+  }
+
   open(): Result<StorageFrameworkEntry, SFError> {
     return new Result((resolve) => {
       this.readDirFromGithub().then((githubEntry) => {
@@ -23,8 +29,8 @@ export class GithubFileSystem implements StorageFrameworkProvider {
   }
 
   private async readDirFromGithub() {
-    const octokit = new Octokit()
-    const { data } = await octokit.request(
+    // const octokit = new Octokit()
+    const { data } = await this.octokit.request(
       'GET /repos/{owner}/{repo}/contents/{path}',
       {
         owner: GithubFileSystem.config.owner,
@@ -32,6 +38,6 @@ export class GithubFileSystem implements StorageFrameworkProvider {
         path: '',
       }
     )
-    return new GithubDirectoryEntry(null, data, true)
+    return new GithubDirectoryEntry(null, data, true, this.octokit)
   }
 }
