@@ -19,7 +19,9 @@ export const createInnerEditor = (
     })
 
     innerView.focus()
+
     const { state } = innerView
+
     // innerView.dispatch(
     //   state.tr.setSelection(TextSelection.create(state.doc, 0))
     // )

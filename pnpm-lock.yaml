@@ -21,6 +21,7 @@ specifiers:
   '@milkdown/theme-nord': ^5.5.0
   '@milkdown/utils': ^5.5.0
   '@sveltejs/vite-plugin-svelte': ^1.0.0-next.30
+  '@tldraw/core': ^1.9.1
   '@tldraw/tldraw': ^1.8.1
   '@tsconfig/svelte': ^2.0.1
   mermaid: ^8.14.0
@@ -60,6 +61,7 @@ dependencies:
   '@milkdown/prose': 5.5.0
   '@milkdown/theme-nord': 5.5.0_ee3a878e89576bb62ebc7021836857a7
   '@milkdown/utils': 5.5.0_ee3a878e89576bb62ebc7021836857a7
+  '@tldraw/core': 1.9.1_4e589064ce40a783661f96d46f38f574
   '@tldraw/tldraw': 1.8.1_4e589064ce40a783661f96d46f38f574
   mermaid: 8.14.0
   mobx: 6.4.2
@@ -1125,8 +1127,8 @@ packages:
       - supports-color
     dev: true
 
-  /@tldraw/core/1.8.0_4e589064ce40a783661f96d46f38f574:
-    resolution: {integrity: sha512-GCf4c3x/y7rUExyAmI1DGqPYdgqNPfnunNDWt6snX9mDpoTmTe84i5YRYl0TDxSNlxQTzRSQ1hJxdXY1mthUaA==}
+  /@tldraw/core/1.9.1_4e589064ce40a783661f96d46f38f574:
+    resolution: {integrity: sha512-gyQFYwuoizDu0K4a8s/M1i3n8ouGF4Uc6zT7+jmJC7ITODBLPY5/xlPe4p58Kyc6Yicj9UVlzhm370k+al3MAQ==}
     peerDependencies:
       react: '>=16.8'
       react-dom: ^16.8 || ^17.0
@@ -1163,7 +1165,7 @@ packages:
       '@radix-ui/react-radio-group': 0.1.5_react@17.0.2
       '@radix-ui/react-tooltip': 0.1.7_react-dom@17.0.2+react@17.0.2
       '@stitches/react': 1.2.7_react@17.0.2
-      '@tldraw/core': 1.8.0_4e589064ce40a783661f96d46f38f574
+      '@tldraw/core': 1.9.1_4e589064ce40a783661f96d46f38f574
       '@tldraw/intersect': 1.7.1
       '@tldraw/vec': 1.7.0
       idb-keyval: 6.1.0

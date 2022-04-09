@@ -11,12 +11,14 @@ export const openDocument = (dataURI: string) => {
   const d = dataURI.replace(prefix, '')
 
   const svg = atob(d)
-  // console.log({ svg })
+  console.log(svg)
 
-  const document = tldrawDataAttribute.exec(svg)?.[1]
+  const match = tldrawDataAttribute.exec(svg)
+  if (!match) return null
+  const doc = [...match].slice(1).find((text) => text)
 
   // console.log(document)
-  if (document) return JSON.parse(btoa(document))
+  if (match) return JSON.parse(atob(doc))
 
-  return createDocument(dataURI)
+  // return createDocument(dataURI)
 }

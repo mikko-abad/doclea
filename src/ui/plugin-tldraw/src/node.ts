@@ -7,6 +7,7 @@ import { tldrawEditor } from '../../tldraw/editor'
 import { remarkMermaid } from './remark-mermaid'
 import { createInnerEditor } from './inner-editor'
 import { getId } from './utility'
+import { TldrawImage } from './tldraw-image'
 
 const inputRegex = /^```mermaid$/
 
@@ -56,6 +57,7 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
         },
       ],
       toDOM: (node) => {
+        console.log('toDOM')
         const identity = getId(node)
         return [
           'img',
@@ -71,6 +73,8 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       parseMarkdown: {
         match: ({ type }) => type === id,
         runner: (state, node, type) => {
+          console.log('parseMarkdown')
+
           const value = node['value'] as string
           state.openNode(type, { value })
           if (value) {
@@ -82,6 +86,7 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       toMarkdown: {
         match: (node) => node.type.name === id,
         runner: (state, node) => {
+          console.log('toMarkdown')
           state.addNode('image', undefined, '', { url: node.value })
         },
       },
@@ -102,20 +107,21 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
 
       // render(node.attrs['value'])
 
-      rendered.innerHTML = `<img src="${node.attrs['value']}">`
+      const image = new TldrawImage(node.attrs['value'])
+      rendered.appendChild(image)
+
+      //rendered.innerHTML = `<img src="${}">`
 
       //const api = renderTLDrawToElement(dom)
       dom.appendChild(rendered)
-      console.log(rendered)
-      rendered.classList.add('rendered')
 
-      const stopPropagation = (e) => e.stopPropagation()
+      rendered.classList.add('rendered')
 
       return {
         dom,
         update: (updatedNode) => {
-          if (!updatedNode.sameMarkup(currentNode)) return false
-          currentNode = updatedNode
+          // if (!updatedNode.sameMarkup(currentNode)) return false
+          // currentNode = updatedNode
 
           const newVal = updatedNode.content.firstChild?.text || ''
           console.log({ newVal })
@@ -125,25 +131,29 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
           return true
         },
         selectNode: () => {
-          if (!view.editable) return
+          //if (!view.editable) return
 
           innerEditor.openEditor(rendered, currentNode)
           tldrawEditor.create(rendered)
+          image.hide()
 
-          //dom.classList.add('ProseMirror-selectednode')
+          dom.classList.add('ProseMirror-selectednode')
         },
-        deselectNode: () => {
+        deselectNode: async () => {
           console.log('deselect')
+
+          const src = await tldrawEditor.destroy()
+          image.setUrl(src)
+
           innerEditor.closeEditor()
-          tldrawEditor.destroy()
           dom.classList.remove('ProseMirror-selectednode')
+          image.show()
         },
         stopEvent: (event) => {
           const innerView = innerEditor.innerView()
           const { target } = event
           const isChild = target && innerView?.dom.contains(target as Element)
 
-          console.log(innerView, isChild, !!(innerView && isChild))
           return !!(innerView && isChild)
         },
         ignoreMutation: () => true,

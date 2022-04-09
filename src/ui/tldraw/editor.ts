@@ -73,30 +73,6 @@ const clip = {
   ],
 }
 
-const myDocument: TDDocument = {
-  id: 'doc',
-  version: TldrawApp.version,
-  pages: {
-    page1: {
-      id: 'page1',
-      shapes: {},
-      bindings: {},
-    },
-  },
-  pageStates: {
-    page1: {
-      id: 'page1',
-      selectedIds: [],
-      currentParentId: 'page1',
-      camera: {
-        point: [0, 0],
-        zoom: 1,
-      },
-    },
-  },
-  assets: {},
-}
-
 function Component({ resolveApi, tdDocument }) {
   const rTldrawApp = React.useRef<TldrawApp>()
 
@@ -109,7 +85,7 @@ function Component({ resolveApi, tdDocument }) {
   return React.createElement(
     Tldraw,
     {
-      document: myDocument,
+      document: tdDocument,
       onMount: handleMount,
       onSaveProjectAs: console.log,
       showMenu: false,
@@ -118,6 +94,10 @@ function Component({ resolveApi, tdDocument }) {
     null
   )
 }
+
+const toImageURL = (svg) => 'data:image/svg+xml;base64,' + btoa(svg)
+
+const serialize = (doc: Object) => btoa(JSON.stringify(doc))
 
 class TldrawView {
   private renderTLDrawToElement(
@@ -143,37 +123,149 @@ class TldrawView {
 
   private mountPoint: HTMLElement
   private api: Promise<TldrawApp>
+  private m
+  private textEditor: HTMLElement
   async create(mountPoint: HTMLElement) {
-    this.destroy()
-    this.mountPoint = mountPoint
-    mountPoint.addEventListener('mouseup', (e) => e.stopPropagation())
-    mountPoint.addEventListener('mousedown', (e) => e.stopPropagation())
-    mountPoint.addEventListener('keydown', (e) => e.stopPropagation())
-    mountPoint.addEventListener('keypress', (e) => e.stopPropagation())
+    //this.destroy()
+
+    this.textEditor = mountPoint.querySelector('.ProseMirror')
+    this.textEditor.style.display = 'none'
+
+    this.mountPoint = document.createElement('div')
+
+    mountPoint.appendChild(this.mountPoint)
+
+    const bp = (e) => {
+      console.log('mp', this.mountPoint)
+      if (this.mountPoint) e.stopPropagation()
+    }
+    mountPoint.addEventListener('mouseup', bp)
+
+    mountPoint.addEventListener('mousedown', bp)
+    mountPoint.addEventListener('keydown', bp)
+    mountPoint.addEventListener('keypress', bp)
 
     const src = mountPoint.querySelector('img').getAttribute('src')
     const d = openDocument(src)
     // console.log(src, d)
-    this.api = this.renderTLDrawToElement(d, mountPoint)
+    this.api = this.renderTLDrawToElement(d, this.mountPoint)
     const api = await this.api
     if (prefersDarkMode) api.toggleDarkMode()
 
-    api.addMediaFromFile(dataURLtoFile(src, 'input.svg'))
+    if (!d) api.addMediaFromFile(dataURLtoFile(src, 'input.svg'))
 
     window.api = api
+  }
+
+  async exportShapesAs(
+    shapeIds: string[],
+    size: number[],
+    type: TDExportTypes
+  ): string {
+    if (!this.api.callbacks.onExport) return
+    //this.api.setIsLoading(true)
+    try {
+      const assets: TDAssets = {}
+      const shapes: TDShape[] = shapeIds.map((id) => {
+        const shape = { ...this.api.getShape(id) }
+        if (shape.assetId) {
+          const asset = { ...this.api.document.assets[shape.assetId] }
+          // If the asset is a GIF, then serialize an image
+          if (asset.src.toLowerCase().endsWith('gif')) {
+            asset.src = this.api.serializeImage(shape.id)
+          }
+          // If the asset is an image, then serialize an image
+          if (shape.type === TDShapeType.Video) {
+            asset.src = this.api.serializeVideo(shape.id)
+            asset.type = TDAssetType.Image
+            // Cast shape to image shapes to properly display snapshots
+            ;(shape as unknown as ImageShape).type = TDShapeType.Image
+          }
+          // Patch asset table
+          assets[shape.assetId] = asset
+        }
+        return shape
+      })
+      // Create serialized data for JSON or SVGs
+      let serialized: string | undefined
+      if (type === TDExportTypes.SVG) {
+        serialized = this.api.copySvg(shapeIds)
+      } else if (type === TDExportTypes.JSON) {
+        serialized = this.api.copyJson(shapeIds)
+      }
+
+      return serialized
+
+      // const exportInfo: TDExport = {
+      //   currentPageId: this.api.currentPageId,
+      //   name: this.page.name ?? 'export',
+      //   shapes,
+      //   assets,
+      //   type,
+      //   serialized,
+      //   size: type === 'png' ? Vec.mul(size, 2) : size,
+      // }
+      // await this.callbacks.onExport(exportInfo)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async exportSvg() {
+    // const initialSelectedIds = [...this.api.selectedIds]
+    this.api.selectAll()
+    const { width, height } = Utils.expandBounds(
+      TLDR.getSelectedBounds(this.api.state),
+      64
+    )
+    const idsToExport = TLDR.getAllEffectedShapeIds(
+      this.api.state,
+      this.api.selectedIds,
+      this.api.currentPageId
+    )
+    // this.api.setSelectedIds(initialSelectedIds)
+    return await this.exportShapesAs(
+      idsToExport,
+      [width, height],
+      TDExportTypes.SVG
+    )
   }
 
   async destroy() {
     if (this.api) {
       const api = await this.api
 
-      const svg = await api.copySvg()
       const doc = api.document
-      console.log({ svg, doc })
-    }
 
-    if (this.mountPoint) ReactDOM.unmountComponentAtNode(this.mountPoint)
-    this.mountPoint = null
+      api.exportAllShapesAs
+
+      console.log(doc)
+
+      let svg = await new Promise(async (resolve) => {
+        api.callbacks.onExport = (all) => {
+          resolve(all.serialized)
+        }
+        await api.exportAllShapesAs(TDExportTypes.SVG)
+      })
+
+      console.log('exp', svg)
+
+      svg = svg.replace('<svg ', `<svg data-tldraw="${serialize(doc)}" `)
+
+      const src = toImageURL(svg)
+      this.textEditor.innerText = src
+
+      if (this.mountPoint) {
+        ReactDOM.unmountComponentAtNode(this.mountPoint)
+
+        this.mountPoint.remove()
+        this.mountPoint = null
+      }
+
+      return src
+
+      //this.mountPoint.appendChild(img)
+    }
   }
 }
 
