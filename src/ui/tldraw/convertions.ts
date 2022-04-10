@@ -1,3 +1,6 @@
+export const toImageURL = (svg) => 'data:image/svg+xml;base64,' + btoa(svg)
+export const serializeDocument = (doc: Object) => btoa(JSON.stringify(doc))
+
 export function dataURLtoFile(dataUrl, fileName) {
   var arr = dataUrl.split(','),
     mime = arr[0].match(/:(.*?);/)[1],
