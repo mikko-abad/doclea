@@ -1,15 +1,12 @@
-/* Copyright 2021, Milkdown by Mirone. */
 import { createCmd, createCmdKey } from '@milkdown/core'
 import { setBlockType, textblockTypeInputRule } from '@milkdown/prose'
 import { createNode } from '@milkdown/utils'
-import { tldrawEditor } from '../../tldraw/editor'
+import { tldrawEditor } from './editor'
 
-import { remarkMermaid } from './remark-mermaid'
 import { createInnerEditor } from './inner-editor'
-import { getId } from './utility'
-import { TldrawImage } from './tldraw-image'
 
-const inputRegex = /^```mermaid$/
+import { TldrawImage } from './tldraw-image'
+import { remarkTldraw } from './remark-tldraw'
 
 export type Options = {
   placeholder: {
@@ -18,7 +15,8 @@ export type Options = {
   }
 }
 
-export const TurnIntoDiagram = createCmdKey('TurnIntoDiagram')
+// TODO: create CMDKey
+// export const TurnIntoDiagram = createCmdKey('TurnIntoDiagram')
 
 export const tldrawNode = createNode<string, Options>((utils, options) => {
   const id = 'tldraw'
@@ -57,7 +55,6 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
         },
       ],
       toDOM: (node) => {
-        console.log('toDOM')
         const identity = getId(node)
         return [
           'img',
@@ -73,8 +70,6 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       parseMarkdown: {
         match: ({ type }) => type === id,
         runner: (state, node, type) => {
-          console.log('parseMarkdown')
-
           const value = node['value'] as string
           state.openNode(type, { value })
           if (value) {
@@ -86,69 +81,51 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
       toMarkdown: {
         match: (node) => node.type.name === id,
         runner: (state, node) => {
-          console.log('toMarkdown')
           state.addNode('image', undefined, '', { url: node.value })
         },
       },
     }),
+    // TODO: TurnIntoDiagram
     commands: (nodeType) => [
-      createCmd(TurnIntoDiagram, () => setBlockType(nodeType, { id: getId() })),
+      //  createCmd(TurnIntoDiagram, () => setBlockType(nodeType, { id: getId() })),
     ],
     view: () => (node, view, getPos) => {
-      const innerEditor = createInnerEditor(view, getPos)
+      // TODO: remove innerEditor but keep state
+      const innerEditor = createInnerEditor()
 
-      const currentId = getId(node)
       let currentNode = node
-      const dom = document.createElement('div')
-      dom.classList.add('tldraw')
 
       const rendered = document.createElement('div')
-      rendered.id = currentId
-
-      // render(node.attrs['value'])
 
       const image = new TldrawImage(node.attrs['value'])
       rendered.appendChild(image)
 
-      //rendered.innerHTML = `<img src="${}">`
-
-      //const api = renderTLDrawToElement(dom)
-      dom.appendChild(rendered)
-
-      rendered.classList.add('rendered')
+      rendered.classList.add('tldraw')
 
       return {
-        dom,
+        dom: rendered,
+        // TODO: check functionality
         update: (updatedNode) => {
-          // if (!updatedNode.sameMarkup(currentNode)) return false
-          // currentNode = updatedNode
-
-          const newVal = updatedNode.content.firstChild?.text || ''
-          console.log({ newVal })
-
-          //render(newVal)
+          // const newVal = updatedNode.content.firstChild?.text || ''
 
           return true
         },
         selectNode: () => {
-          //if (!view.editable) return
-
           innerEditor.openEditor(rendered, currentNode)
           tldrawEditor.create(rendered)
           image.hide()
 
-          dom.classList.add('ProseMirror-selectednode')
+          rendered.classList.add('ProseMirror-selectednode')
         },
         deselectNode: async () => {
-          console.log('deselect')
-
           const src = await tldrawEditor.destroy()
           image.setUrl(src)
 
           innerEditor.closeEditor()
-          dom.classList.remove('ProseMirror-selectednode')
+          rendered.classList.remove('ProseMirror-selectednode')
           image.show()
         },
+        // TODO: check functionality
         stopEvent: (event) => {
           const innerView = innerEditor.innerView()
           const { target } = event
@@ -159,17 +136,16 @@ export const tldrawNode = createNode<string, Options>((utils, options) => {
         ignoreMutation: () => true,
         destroy() {
           rendered.remove()
-
-          dom.remove()
         },
       }
     },
+    // TODO: maybe create a shortcut
     inputRules: (nodeType) => {
-      console.log(nodeType)
+      const inputRegex = /^```mermaid$/
       return [
-        textblockTypeInputRule(inputRegex, nodeType, () => ({ id: getId() })),
+        //  textblockTypeInputRule(inputRegex, nodeType, () => ({ id: getId() })),
       ]
     },
-    remarkPlugins: () => [remarkMermaid],
+    remarkPlugins: () => [remarkTldraw],
   }
 })

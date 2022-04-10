@@ -1,5 +1,3 @@
-/* Copyright 2021, Milkdown by Mirone. */
-
 import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
@@ -25,7 +23,7 @@ const visitCodeBlock = (ast: Node) =>
     return node
   })
 
-export const remarkMermaid = () => {
+export const remarkTldraw = () => {
   function transformer(tree: Node) {
     visitCodeBlock(tree)
   }

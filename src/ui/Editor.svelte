@@ -70,7 +70,7 @@
     z-index: 5;
   }
 
-  :global(.rendered) {
+  :global(.tldraw) {
     position: relative;
     width: 100%;
     height: 500px;

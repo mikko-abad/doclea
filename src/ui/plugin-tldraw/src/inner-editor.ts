@@ -1,15 +1,9 @@
 import { EditorState, EditorView, Node } from '@milkdown/prose'
 
-export const createInnerEditor = (
-  outerView: EditorView,
-  getPos: () => number
-) => {
-  let isEditing = false
+export const createInnerEditor = () => {
   let innerView: EditorView | undefined
 
   const openEditor = ($: HTMLElement, doc: Node) => {
-    const st = EditorState.create({ doc })
-
     innerView = new EditorView($, {
       state: EditorState.create({
         doc,
@@ -20,12 +14,8 @@ export const createInnerEditor = (
 
     innerView.focus()
 
-    const { state } = innerView
-
-    // innerView.dispatch(
-    //   state.tr.setSelection(TextSelection.create(state.doc, 0))
-    // )
-    isEditing = true
+    const textEditor: HTMLElement = $.querySelector('.ProseMirror')
+    textEditor.style.display = 'none'
   }
 
   const closeEditor = () => {
@@ -33,13 +23,11 @@ export const createInnerEditor = (
       innerView.destroy()
     }
     innerView = undefined
-    isEditing = false
   }
 
   return {
-    isEditing: () => isEditing,
-    innerView: () => innerView,
     openEditor,
     closeEditor,
+    innerView: () => innerView,
   }
 }

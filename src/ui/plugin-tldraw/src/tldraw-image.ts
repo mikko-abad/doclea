@@ -17,9 +17,9 @@ class TldrawImage extends HTMLImageElement {
   }
 }
 
-customElements.define('word-count', TldrawImage, { extends: 'img' })
+customElements.define('tldraw-image', TldrawImage, { extends: 'img' })
 
 // @ts-ignore
-const element: TldrawImage = customElements.get('word-count')
+const element: typeof TldrawImage = customElements.get('tldraw-image')
 
 export { element as TldrawImage }

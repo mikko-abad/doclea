@@ -1,17 +1,13 @@
 import * as React from 'react'
-import {
-  Tldraw,
-  TldrawApp,
-  TDShapeType,
-  ColorStyle,
-  TDDocument,
-  TDExportTypes,
-} from '@tldraw/tldraw'
+import { Tldraw, TldrawApp, TDDocument, TDExportTypes } from '@tldraw/tldraw'
 import ReactDOM from 'react-dom'
 import { getDocumentFromImageUri } from './getDocumentFromImageUri'
-import { prefersDarkMode } from '../prefersDarkMode'
 
 import { dataURLtoFile, serializeDocument, toImageURL } from './convertions'
+
+const prefersDarkMode = Boolean(
+  window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+)
 
 function Component({ resolveApi, tdDocument }) {
   const rTldrawApp = React.useRef<TldrawApp>()
@@ -90,10 +86,6 @@ class TldrawView {
   }
 
   async create(mountPoint: HTMLElement) {
-    // hide default editor
-    const textEditor: HTMLElement = mountPoint.querySelector('.ProseMirror')
-    textEditor.style.display = 'none'
-
     this.blockEventBubble(mountPoint)
 
     // get image url
@@ -105,12 +97,14 @@ class TldrawView {
 
     if (prefersDarkMode) this.api.toggleDarkMode()
 
+    //@ts-ignore
     if (!document) this.api.addMediaFromFile(dataURLtoFile(src, 'input.svg'))
   }
 
   async destroy() {
     // export svg
-    let svg = await new Promise(async (resolve) => {
+    let svg: string = await new Promise(async (resolve) => {
+      // @ts-ignore
       this.api.callbacks.onExport = (all) => {
         resolve(all.serialized)
       }
