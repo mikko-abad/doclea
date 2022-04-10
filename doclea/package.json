@@ -30,6 +30,7 @@
     "parcel": "^2.4.1",
     "parcel-transformer-svelte": "^1.2.3",
     "storage-framework": "file:../storage-framework",
+    "milkdown-plugin-tldraw": "file:../milkdown-plugin-tldraw",
     "tabler-icons-svelte": "^1.7.0"
   },
   "devDependencies": {
