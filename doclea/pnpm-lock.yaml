@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@milkdown/core': ^5.5.0
+  '@milkdown/core': 5.5.0
   '@milkdown/plugin-clipboard': ^5.5.0
   '@milkdown/plugin-cursor': ^5.5.0
   '@milkdown/plugin-diagram': ^5.5.0
@@ -17,11 +17,12 @@ specifiers:
   '@milkdown/plugin-upload': ^5.5.0
   '@milkdown/preset-commonmark': ^5.5.0
   '@milkdown/preset-gfm': ^5.5.0
-  '@milkdown/prose': ^5.5.0
+  '@milkdown/prose': 5.5.0
   '@milkdown/theme-nord': ^5.5.0
+  '@milkdown/utils': 5.5.0
   '@parcel/config-default': ^2.4.1
   '@tsconfig/svelte': ^3.0.0
-  milkdown-plugin-tldraw: file:../milkdown-plugin-tldraw
+  milkdown-plugin-tldraw: file:./milkdown-plugin-tldraw
   parcel: ^2.4.1
   parcel-transformer-svelte: ^1.2.3
   storage-framework: file:../storage-framework
@@ -48,8 +49,9 @@ dependencies:
   '@milkdown/preset-gfm': 5.5.0_b8e99fb6b049dba03aaadac54edfd796
   '@milkdown/prose': 5.5.0
   '@milkdown/theme-nord': 5.5.0_ee3a878e89576bb62ebc7021836857a7
+  '@milkdown/utils': 5.5.0_ee3a878e89576bb62ebc7021836857a7
   '@parcel/config-default': 2.4.1
-  milkdown-plugin-tldraw: link:../milkdown-plugin-tldraw
+  milkdown-plugin-tldraw: link:milkdown-plugin-tldraw
   parcel: 2.4.1
   parcel-transformer-svelte: 1.2.3
   storage-framework: link:../storage-framework
